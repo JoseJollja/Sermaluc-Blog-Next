@@ -12,8 +12,12 @@ export interface GetAllArticlesResponseData extends IArticle {
   user: IUser
 }
 
-export interface MeQueryProps extends AxiosRequestConfig {}
+export interface GetAllArticlesQueryProps extends AxiosRequestConfig {}
 
-export const getAllArticlesQuery = (props: MeQueryProps = {}) => {
-  return api.get<GetAllArticlesResponse>('/articles', props)
+export const getAllArticlesQuery = async (
+  props: GetAllArticlesQueryProps = {}
+) => {
+  return api
+    .get<GetAllArticlesResponse>('/articles', props)
+    .then((res) => res.data)
 }

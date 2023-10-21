@@ -8,6 +8,6 @@ export type MeQueryResponse = ApiResponse<IUser>
 
 export interface MeQueryProps extends AxiosRequestConfig {}
 
-export const meQuery = (props: MeQueryProps = {}) => {
-  return api.get<MeQueryResponse>('/auth/me', props)
+export const meQuery = async (props: MeQueryProps = {}) => {
+  return api.get<MeQueryResponse>('/auth/me', props).then((res) => res.data)
 }

@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 
 import { isServer } from '@/utils'
 
-const api = axios.create({ baseURL: 'http://localhost:8080/api' })
+const api = axios.create()
 
 // @ts-ignore
 api.interceptors.request.use((config) => {
@@ -12,6 +12,7 @@ api.interceptors.request.use((config) => {
 
     return {
       ...config,
+      baseURL: '/api',
       headers: {
         ...config.headers,
         Authorization: token ? `Bearer ${token}` : ''
@@ -19,7 +20,7 @@ api.interceptors.request.use((config) => {
     }
   }
 
-  return config
+  return { ...config, baseURL: process.env.API_URL + '/api' }
 })
 
 export { api }

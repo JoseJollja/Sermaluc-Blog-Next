@@ -24,6 +24,6 @@ export interface RegisterMutationProps extends AxiosRequestConfig {
   body: RegisterMutationVariables
 }
 
-export const RegisterMutation = ({ body, ...props }: RegisterMutationProps) => {
+export const registerMutation = ({ body, ...props }: RegisterMutationProps) => {
   return api.post<RegisterMutationResponse>('/auth/register', body, props)
 }

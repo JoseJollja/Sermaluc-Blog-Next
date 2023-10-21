@@ -21,39 +21,59 @@ import { BasicModal } from '@/components/ui/basic-modal'
 
 import { useAuthStore } from '@/stores/auth.store'
 import { useLoginMutation } from '@/hooks/mutations/auth/use-login-mutation'
+import { useRegisterMutation } from '@/hooks/mutations/auth/use-register-mutation'
+import { UserRole, UserStatus } from '@/interface/user'
 
 type Props = {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }
 
-const formSchema = z.object({
-  email: z.string().email({ message: 'Correo inválido' }),
-  password: z.string().min(6, { message: 'Mínimo 6 caracteres' }),
-  remember: z.boolean()
-})
+const formSchema = z
+  .object({
+    name: z.string().min(3, { message: 'El nombre es requerido' }),
+    email: z.string().email({ message: 'El correo no es válido' }),
+    lastname: z.string().min(3, { message: 'El apellido es requerido' }),
+    password: z.string().min(6, { message: 'Mínimo 6 caracteres' }),
+    confirmPassword: z.string().min(6, { message: 'Mínimo 6 caracteres' }),
+    rol: z.enum([UserRole.ADMIN, UserRole.USER]),
+    status: z.enum([UserStatus.ACTIVO, UserStatus.INACTIVO])
+  })
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['confirmPassword'],
+        message: 'Las contraseñas no coinciden'
+      })
+    }
+  })
 
 type FormValues = z.infer<typeof formSchema>
 
-const ModalLoginForm = (props: Props) => {
+const ModalRegisterForm = (props: Props) => {
   const auth = useAuthStore()
-  const { mutate, isPending } = useLoginMutation()
+  const { mutate, isPending } = useRegisterMutation()
 
   const form = useForm<FormValues>({
     mode: 'onChange',
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
+      lastname: '',
       password: '',
-      remember: false
+      confirmPassword: '',
+      rol: UserRole.USER,
+      status: UserStatus.ACTIVO
     }
   })
 
-  const onSubmit = async (values: FormValues) => {
-    mutate(values, {
+  const onSubmit = async ({ confirmPassword, ...args }: FormValues) => {
+    mutate(args, {
       onSuccess: (data) => {
         if (!data.ok) {
-          console.log('[ERROR_LOGIN]: ', data.errors)
+          console.log('[ERROR_REGISTER]: ', data.errors)
           return
         }
 
@@ -65,20 +85,6 @@ const ModalLoginForm = (props: Props) => {
         props.onOpenChange(false)
       },
       onError: (error) => {
-        if (error.response?.data?.errors) {
-          const errors: Record<string, string> = {}
-
-          error.response?.data?.errors?.forEach((err) => {
-            errors[err.field] = err.message
-          })
-
-          if (errors.credentials) {
-            toast.warning('Credeniales incorrectas')
-          }
-
-          return
-        }
-
         console.log('[ERROR_LOGIN]: ', error)
       }
     })
@@ -88,13 +94,39 @@ const ModalLoginForm = (props: Props) => {
     <BasicModal
       isOpen={props.isOpen}
       onOpenChange={props.onOpenChange}
-      title="Iniciar sesión"
+      title="Registrarse"
       className="w-[90vw] max-w-sm"
-      description="Ingresa tu correo para iniciar sesión a tu cuenta"
+      description="Ingresa tu correo para crear tu cuenta"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-3 mb-8">
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ingresa tu nombre" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="lastname"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Apellido</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ingresa tu apellido" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               name="email"
               control={form.control}
@@ -125,31 +157,28 @@ const ModalLoginForm = (props: Props) => {
                 </FormItem>
               )}
             />
-          </div>
-
-          <FormField
-            name="remember"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <Label className="flex items-center gap-x-2 mb-8">
+            <FormField
+              name="confirmPassword"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirmar contraseña</FormLabel>
                   <FormControl>
-                    <>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                      <span>Recordarme</span>
-                    </>
+                    <Input
+                      type="password"
+                      placeholder="Ingresa tu contraseña"
+                      {...field}
+                    />
                   </FormControl>
-                </Label>
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <Button className="w-full" disabled={isPending}>
             {isPending && <Loader className="animate-spin mr-3" />}
-            Ingresar
+            Registrarse
           </Button>
         </form>
       </Form>
@@ -157,4 +186,4 @@ const ModalLoginForm = (props: Props) => {
   )
 }
 
-export default ModalLoginForm
+export default ModalRegisterForm

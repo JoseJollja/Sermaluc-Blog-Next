@@ -1,10 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
+import Cookies from 'js-cookie'
 import {
-  HexagonIcon,
-  LayoutDashboardIcon,
+  UserIcon,
   LogOutIcon,
-  UserIcon
+  HexagonIcon,
+  LayoutDashboardIcon
 } from 'lucide-react'
 import { Button } from '../ui/button'
 import useToggle from '@/hooks/use-toggle'
@@ -18,12 +19,14 @@ import {
   DropdownMenuSeparator
 } from '../ui/dropdown-menu'
 import ModalLoginForm from '../shared/modal-login-form'
+import ModalRegisterForm from '../shared/modal-register-form'
 
 type Props = {}
 
 const Navbar = (props: Props) => {
-  const toggle = useToggle()
   const auth = useAuthStore()
+  const toggleLogin = useToggle()
+  const toggleRegister = useToggle()
 
   return (
     <>
@@ -34,41 +37,67 @@ const Navbar = (props: Props) => {
             <span className="ml-3 text-xl">Blog</span>
           </Link>
 
-          {!auth.isAuth && (
-            <Button onClick={toggle.onOpen}>Iniciar sesión</Button>
-          )}
+          <div className="h-10">
+            {!auth.isLoading && (
+              <>
+                {!auth.isAuth && (
+                  <div className="space-x-4">
+                    <Button variant="outline" onClick={toggleRegister.onOpen}>
+                      Registrarse
+                    </Button>
+                    <Button onClick={toggleLogin.onOpen}>Iniciar sesión</Button>
+                  </div>
+                )}
 
-          {auth.isAuth && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="outline">
-                  <UserIcon className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuGroup>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">
-                      <LayoutDashboardIcon className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={auth.logoutAction}>
-                    <LogOutIcon className="mr-2 h-4 w-4" />
-                    <span>Cerrar sesión</span>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                {auth.isAuth && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="icon" variant="outline">
+                        <UserIcon className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem asChild>
+                          <Link href="/dashboard">
+                            <LayoutDashboardIcon className="mr-2 h-4 w-4" />
+                            <span>Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            Cookies.remove('token')
+                            auth.logoutAction()
+                          }}
+                        >
+                          <LogOutIcon className="mr-2 h-4 w-4" />
+                          <span>Cerrar sesión</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </header>
 
       {!auth.isAuth && (
-        <ModalLoginForm isOpen={toggle.isOpen} onOpenChange={toggle.onToggle} />
+        <ModalLoginForm
+          isOpen={toggleLogin.isOpen}
+          onOpenChange={toggleLogin.onToggle}
+        />
+      )}
+
+      {!auth.isAuth && (
+        <ModalRegisterForm
+          isOpen={toggleRegister.isOpen}
+          onOpenChange={toggleRegister.onToggle}
+        />
       )}
     </>
   )

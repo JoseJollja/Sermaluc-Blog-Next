@@ -3,8 +3,8 @@ import React from 'react'
 
 const Footer = () => {
   return (
-    <footer className="text-gray-400 bg-background body-font">
-      <div className="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
+    <footer className="text-gray-400 bg-background body-font border-t">
+      <div className="container px-5 py-6 mx-auto flex items-center sm:flex-row flex-col">
         <a className="flex title-font font-medium items-center md:justify-start justify-center text-white">
           <HexagonIcon />
           <span className="ml-3 text-xl">Blog</span>
