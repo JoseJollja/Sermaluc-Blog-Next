@@ -20,11 +20,15 @@ import {
 } from '../ui/dropdown-menu'
 import ModalLoginForm from '../shared/modal-login-form'
 import ModalRegisterForm from '../shared/modal-register-form'
+import { usePathname } from 'next/navigation'
+import { useRouter } from 'next/router'
 
 type Props = {}
 
 const Navbar = (props: Props) => {
   const auth = useAuthStore()
+  const router = useRouter()
+  const pathname = usePathname()
   const toggleLogin = useToggle()
   const toggleRegister = useToggle()
 
@@ -71,6 +75,7 @@ const Navbar = (props: Props) => {
                           onClick={() => {
                             Cookies.remove('token')
                             auth.logoutAction()
+                            if (pathname === '/dashboard') router.replace('/')
                           }}
                         >
                           <LogOutIcon className="mr-2 h-4 w-4" />

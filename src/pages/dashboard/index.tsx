@@ -33,6 +33,7 @@ import { useDeleteArticleMutation } from '@/hooks/mutations/article/use-delete-a
 import { BasicModal } from '@/components/ui/basic-modal'
 import ModalArticleForm from '@/components/shared/modal-article-form'
 import { Seo } from '@/components/shared/seo'
+import { useMeQuery } from '@/hooks/queries/auth/use-me-query'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const queryClient = new QueryClient()
@@ -74,8 +75,10 @@ const DashboardPage = () => {
   const toggleModal = useToggle()
   const toggleAlert = useToggle()
   const client = useQueryClient()
-  const user = useAuthStore((state) => state.user)
   const [articleId, setArticleId] = useState<string | null>(null)
+
+  const meQuery = useMeQuery()
+  const user = (meQuery.data?.ok && meQuery.data?.data) || null
 
   const deleteMutation = useDeleteArticleMutation()
   const { data, isLoading, refetch } = useGetAllArticlesQuery({
@@ -107,7 +110,12 @@ const DashboardPage = () => {
     <>
       <Seo title={`${user?.name} ${user?.lastname} | Blog`} />
       <div className="flex-1 grid sm:grid-rows-1 sm:grid-cols-[minmax(0px,_218px)_minmax(0px,_1fr)]">
-        <Sidebar onAddArticle={toggleModal.onOpen} />
+        <Sidebar
+          onAddArticle={() => {
+            setArticleId(null)
+            toggleModal.onOpen()
+          }}
+        />
 
         <div>
           {!isLoading && data?.ok && (
@@ -196,7 +204,8 @@ const DashboardPage = () => {
       <ModalArticleForm
         isOpen={toggleModal.isOpen}
         selectedArticle={selectedArticle}
-        onOpenChange={() => {
+        onOpenChange={toggleModal.onToggle}
+        onClose={() => {
           setArticleId(null)
           toggleModal.onClose()
         }}

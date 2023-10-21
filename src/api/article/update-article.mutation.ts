@@ -8,6 +8,7 @@ export type UpdateArticleMutationResponse = ApiResponse<IArticle>
 export interface UpdateArticleMutationVariables {
   title: string
   content: string
+  photoId: string
 }
 
 export interface UpdateArticleMutationProps extends AxiosRequestConfig {

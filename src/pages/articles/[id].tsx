@@ -65,7 +65,7 @@ const ArticleByIDPage = ({ articleId }: { articleId: string }) => {
             fill
             priority
             alt="blog"
-            src="https://dummyimage.com/720x400"
+            src={'/uploads/' + article?.photo?.filename}
             className="w-full object-cover object-center"
           />
         </div>

@@ -68,14 +68,15 @@ export default function Home() {
                         fill
                         priority
                         alt="blog"
-                        src="https://dummyimage.com/720x400"
+                        src={'/uploads/' + article.photo?.filename ?? ''}
                         className="lg:h-48 md:h-36 w-full object-cover object-center"
+                        sizes="(max-width: 710px) 280px, (max-width: 991px) 300px, 400px"
                       />
                     </div>
 
                     <CardHeader>
                       <CardDescription>
-                        {article.user.name} {article.user.lastname}
+                        {article.user?.name} {article.user?.lastname}
                       </CardDescription>
                       <Link href={`/articles/${article.id}`}>
                         <CardTitle className="hover:underline">
