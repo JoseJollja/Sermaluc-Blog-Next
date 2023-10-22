@@ -66,6 +66,7 @@ const ArticleByIDPage = ({ articleId }: { articleId: string }) => {
             priority
             alt="blog"
             src={'/uploads/' + article?.photo?.filename}
+            sizes="(max-width: 425px) 400px, 768px"
             className="w-full object-cover object-center"
           />
         </div>

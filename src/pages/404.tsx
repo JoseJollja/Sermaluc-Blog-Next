@@ -13,8 +13,8 @@ const Error = () => {
             Esta página no existe
           </p>
 
-          <Link href="/">
-            <a className="btn bg-primary-300 text-white">Volver al inicio</a>
+          <Link href="/" className="btn bg-primary-300 text-white">
+            Volver al inicio
           </Link>
         </div>
       </div>
